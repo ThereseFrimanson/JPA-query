@@ -30,10 +30,10 @@ public class HibernateTest
 
 
 		//2. Find students' name and their tutors' name, use report Query and JOIN.
-		Query q2 = em.createQuery("select s.name, tg.name from Student s JOIN s.teachingGroup tg");
+		Query q2 = em.createQuery("select stud.name, t.name from Tutor t JOIN t.teachingGroup as stud");
 		List<Object[]> q2results = q2.getResultList();
 		for(Object[] result : q2results){
-			String sName = (String) q2results[0];
+			String sName = (String) q2results[0]; //Jag vet att detta är fel
 			String tName = (String) q2results[1];
 			System.out.println("student: " + sName + "tutor: " + tName );
 		}
