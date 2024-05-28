@@ -18,24 +18,27 @@ public class HibernateTest
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 
+		//------------------------------------------------------------------------
+
 		//1. Query to find students whose tutor teach science
-		Query q1 = em.createQuery("select s from Student s JOIN s.tutor t JOIN t.subjects sub WHERE sub.name = :subjectName");
+		Query q1 = em.createQuery("select DISTINCT s from Student s JOIN s.teachingGroup tg JOIN tg.subjectsToTeach sub WHERE sub.subjectName = :subjectName");
 		q1.setParameter("subjectName", "Science");
 		List<Student> q1students = q1.getResultList();
 		for (Student student : q1students) {
 			System.out.println(student);
 		}
 
+
 		//2. Find students' name and their tutors' name, use report Query and JOIN.
-		Query q2 = em.createQuery("select s.name, t.name from Student s JOIN s.tutor t");
+		Query q2 = em.createQuery("select s.name, tg.name from Student s JOIN s.teachingGroup tg");
 		List<Object[]> q2results = q2.getResultList();
-		for(Object[] results : q2results){
+		for(Object[] result : q2results){
 			String sName = (String) q2results[0];
 			String tName = (String) q2results[1];
 			System.out.println("student: " + sName + "tutor: " + tName );
 		}
 
-		//3. Use aggregation to get the average lenght of a semester for the subjects.
+		//3. Use aggregation to get the average length of a semester for the subjects.
 		Query q3 = em.createQuery("select AVG(sub.numberOfSemesters) from Subject sub");
 		Double avgSemesters =(Double) q3.getSingleResult();
 		System.out.println("The average numbers of semesters for a subject is: " + avgSemesters);
@@ -54,6 +57,7 @@ public class HibernateTest
 		for(String name : q5results){
 			System.out.println("Here are the tutors with a salary over 10.000 SEK: " + name);
 		}
+//-------------------------------------------------------------------------------
 
 		List<Student> results = em.createNamedQuery("searchByName", Student.class).setParameter("name", "Jimi Hendriks").getResultList();
 		for(Student student: results) {
@@ -61,7 +65,7 @@ public class HibernateTest
 		}
 
 		Query qName = em.createQuery("select student.name from Student student");
-		List<String>results2 = q.getResultList();
+		List<String>results2 = qName.getResultList();
 		for(String name:results2) {
 			System.out.println(name);
 		}
@@ -74,6 +78,7 @@ public class HibernateTest
 
 		long numberOfStudents = (Long)em.createQuery("select count(student)from Student student").getSingleResult();
 		System.out.println("We have " + numberOfStudents + " students");
+
 
 		List<Object[]> results4 = em.createNativeQuery("select s.name,s.enrollmentid from student s").getResultList();
 		for(Object[] result: results4) {
