@@ -1,15 +1,12 @@
 package se.yrgo.test;
 
 import jakarta.persistence.*;
-
 import se.yrgo.domain.Student;
 import se.yrgo.domain.Subject;
 import se.yrgo.domain.Tutor;
-
 import java.util.List;
 
-public class HibernateTest
-{
+public class HibernateTest {
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("databaseConfig");
 
 	public static void main(String[] args){
@@ -21,12 +18,12 @@ public class HibernateTest
 		//------------------------------------------------------------------------
 
 		//1. Query to find students whose tutor teach science
-		Query q1 = em.createQuery("select DISTINCT s from Student s JOIN s.teachingGroup tg JOIN tg.subjectsToTeach sub WHERE sub.subjectName = :subjectName");
-		q1.setParameter("subjectName", "Science");
-		List<Student> q1students = q1.getResultList();
-		for (Student student : q1students) {
-			System.out.println(student);
-		}
+		Subject science = em.find(Subject.class, science); 
+		List<Student> teachingGroup = em.createQuery(
+    	"select student s from Tutor t join t.teachingGroup s where :subject member of t.subjectsToTeach",
+    	Student.class
+		).setParameter("subject", science).getResultList();
+		teachingGroup.forEach(student -> System.out.println(student.getName()));
 
 
 		//2. Find students' name and their tutors' name, use report Query and JOIN.
@@ -57,7 +54,7 @@ public class HibernateTest
 		for(String name : q5results){
 			System.out.println("Here are the tutors with a salary over 10.000 SEK: " + name);
 		}
-//-------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------
 
 		List<Student> results = em.createNamedQuery("searchByName", Student.class).setParameter("name", "Jimi Hendriks").getResultList();
 		for(Student student: results) {
@@ -96,11 +93,10 @@ public class HibernateTest
 		em.close();
 	}
 
-	public static void setUpData(){
+	public static void setUpData() {
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
-
 
 		Subject mathematics = new Subject("Mathematics", 2);
 		Subject science = new Subject("Science", 2);
@@ -113,8 +109,6 @@ public class HibernateTest
 		t1.addSubjectsToTeach(mathematics);
 		t1.addSubjectsToTeach(science);
 
-
-		Tutor t2 = new Tutor("DEF456", "Sara Svensson", 20000);
 		t2.addSubjectsToTeach(mathematics);
 		t2.addSubjectsToTeach(science);
 
@@ -126,7 +120,6 @@ public class HibernateTest
 		em.persist(t2);
 		em.persist(t3);
 
-
 		t1.createStudentAndAddtoTeachingGroup("Jimi Hendriks", "1-HEN-2019", "Street 1", "city 2", "1212");
 		t1.createStudentAndAddtoTeachingGroup("Bruce Lee", "2-LEE-2019", "Street 2", "city 2", "2323");
 		t3.createStudentAndAddtoTeachingGroup("Roger Waters", "3-WAT-2018", "Street 3", "city 3", "34343");
@@ -134,6 +127,5 @@ public class HibernateTest
 		tx.commit();
 		em.close();
 	}
-
 
 }

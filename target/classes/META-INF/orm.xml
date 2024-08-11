@@ -7,6 +7,10 @@
 	<named-query name="searchByName">
 		<query>from Student as student where student.name= :name</query>
 	</named-query>
+
+	<named-query name="Tutor.findSalaryOverTenK">
+		<query>select t.name from Tutor t where t.salary > 10000 </query>
+	</named-query>
 	<!--  this is used in the chapter on HQL, where we write a named query -->
 	<!--  please ignore it until then! -->
 
